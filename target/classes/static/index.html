@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlTag">
+<head>
+    <meta charset="UTF-8">
+    <title>ScriptUp - صانع السكريبتات البيعية</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+        .lang-switch {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+        }
+        html[dir="ltr"] .lang-switch {
+            left: auto;
+            right: 20px;
+        }
+        .lang-btn {
+            background-color: #34495e;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #444;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+        button.generate-btn {
+            width: 100%;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button.generate-btn:hover {
+            background-color: #27ae60;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            color: #555;
+            font-style: italic;
+        }
+        .result-box {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #ebf5fb;
+            border-right: 5px solid #3498db;
+            border-radius: 8px;
+        }
+        html[dir="ltr"] .result-box {
+            border-right: none;
+            border-left: 5px solid #3498db;
+        }
+        .result-box h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .result-content {
+            white-space: pre-wrap;
+            color: #34495e;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="lang-switch">
+        <button class="lang-btn" id="langBtn" onclick="toggleLanguage()">English</button>
+    </div>
+
+    <h1 id="mainTitle">ScriptUp Copywriter 🚀</h1>
+    <p class="subtitle" id="subTitle">اصنع سيناريوهات بيعية تكتسح السوشيال ميديا بكبسة زر</p>
+
+    <div class="form-group">
+        <label id="lblProduct">اسم المنتج أو الخدمة:</label>
+        <input type="text" id="productName" placeholder="مثال: كورس المبيعات العالية، علبة فيتامينات...">
+    </div>
+
+    <div class="form-group">
+        <label id="lblAudience">الجمهور المستهدف بالتحديد:</label>
+        <input type="text" id="audience" placeholder="مثال: أصحاب الشركات الناشئة، الأمهات...">
+    </div>
+
+    <div class="form-group">
+        <label id="lblPain">المشكلة الأكبر التي يحلها المنتج (Pain Point):</label>
+        <textarea id="painPoint" placeholder="مثال: ضعف مبيعات الإغلاق، عدم التركيز والتعب المستمر..."></textarea>
+    </div>
+
+    <button class="generate-btn" id="btnSubmit" onclick="generateScript()">توليد السيناريو البيعي ✨</button>
+
+    <div class="loading" id="loading">جاري التفكير وصياغة السيناريو بأعلى جودة مبيعات...</div>
+
+    <div class="result-box" id="resultBox">
+        <h3 id="resultTitle">السيناريو البيعي المقترح:</h3>
+        <div class="result-content" id="resultContent"></div>
+    </div>
+</div>
+
+<script>
+    // نظام الترجمة والتبديل الفوري للواجهة
+    let currentLang = 'ar';
+
+    const translations = {
+        ar: {
+            title: "ScriptUp Copywriter 🚀",
+            subtitle: "اصنع سيناريوهات بيعية تكتسح السوشيال ميديا بكبسة زر",
+            product: "اسم المنتج أو الخدمة:",
+            productPlh: "مثال: كورس المبيعات العالية، علبة فيتامينات...",
+            audience: "الجمهور المستهدف بالتحديد:",
+            audiencePlh: "مثال: أصحاب الشركات الناشئة، الأمهات...",
+            pain: "المشكلة الأكبر التي يحلها المنتج (Pain Point):",
+            painPlh: "مثال: ضعف مبيعات الإغلاق، عدم التركيز والتعب المستمر...",
+            btn: "توليد السيناريو البيعي ✨",
+            loading: "جاري التفكير وصياغة السيناريو بأعلى جودة مبيعات...",
+            resTitle: "السيناريو البيعي المقترح:",
+            alertMsg: "الرجاء تعبئة جميع الخانات أولاً يا بطل!",
+            btnLang: "English"
+        },
+        en: {
+            title: "ScriptUp Copywriter 🚀",
+            subtitle: "Create high-converting sales scripts with a single click",
+            product: "Product or Service Name:",
+            productPlh: "e.g., High-Ticket Sales Course, Vitamin Supplements...",
+            audience: "Specific Target Audience:",
+            audiencePlh: "e.g., Startup Founders, Busy Mothers...",
+            pain: "Biggest Problem It Solves (Pain Point):",
+            painPlh: "e.g., Low closing rates, lack of focus & fatigue...",
+            btn: "Generate Sales Script ✨",
+            loading: "Crafting a killer script based on high-ticket psychology...",
+            resTitle: "Proposed Sales Script:",
+            alertMsg: "Please fill out all fields first, champ!",
+            btnLang: "العربية"
+        }
+    };
+
+    function toggleLanguage() {
+        const html = document.getElementById('htmlTag');
+        if (currentLang === 'ar') {
+            currentLang = 'en';
+            html.setAttribute('dir', 'ltr');
+            html.setAttribute('lang', 'en');
+        } else {
+            currentLang = 'ar';
+            html.setAttribute('dir', 'rtl');
+            html.setAttribute('lang', 'ar');
+        }
+        applyTranslations();
+    }
+
+    function applyTranslations() {
+        const t = translations[currentLang];
+        document.getElementById('langBtn').innerText = t.btnLang;
+        document.getElementById('mainTitle').innerText = t.title;
+        document.getElementById('subTitle').innerText = t.subtitle;
+        document.getElementById('lblProduct').innerText = t.product;
+        document.getElementById('productName').placeholder = t.productPlh;
+        document.getElementById('lblAudience').innerText = t.audience;
+        document.getElementById('audience').placeholder = t.audiencePlh;
+        document.getElementById('lblPain').innerText = t.pain;
+        document.getElementById('painPoint').placeholder = t.painPlh;
+        document.getElementById('btnSubmit').innerText = t.btn;
+        document.getElementById('loading').innerText = t.loading;
+        document.getElementById('resultTitle').innerText = t.resTitle;
+    }
+
+    async function generateScript() {
+        const productName = document.getElementById('productName').value;
+        const audience = document.getElementById('audience').value;
+        const painPoint = document.getElementById('painPoint').value;
+
+        if (!productName || !audience || !painPoint) {
+            alert(translations[currentLang].alertMsg);
+            return;
+        }
+
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('resultBox').style.display = 'none';
+
+        try {
+            const response = await fetch('http://localhost:8080/api/generate-script', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productName, audience, painPoint })
+            });
+
+            if (!response.ok) throw new Error('Server Error');
+
+            const data = await response.json();
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('resultBox').style.display = 'block';
+
+            // إذا كانت الواجهة إنجليزية، نترجم الهيكل محلياً فوراً
+            if (currentLang === 'en') {
+                document.getElementById('resultContent').innerText =
+                    `🔥 High-Ticket Sales Script for (${audience}) 🔥\n\n` +
+                    `📍 [Scene 1: Hitting the Pain Point]\n` +
+                    `Are you tired of constantly dealing with (${painPoint})?\n` +
+                    `Every time you try to fix it, do you find yourself back at square one? You are not alone. Thousands of (${audience}) face this exact frustration daily.\n\n` +
+                    `💡 [Scene 2: Introducing the Perfect Solution]\n` +
+                    `That's exactly why we created the ultimate solution: (${productName}).\n` +
+                    `This isn't just another ordinary offer; it's a dedicated framework engineered to eliminate (${painPoint}) and help you get maximum conversion intelligently.\n\n` +
+                    `🚀 [Scene 3: Key Features & Outcomes]\n` +
+                    `- Complete and instant relief from: ${painPoint}\n` +
+                    `- Reverse-engineered specifically to fit: ${audience}\n` +
+                    `- Proven, tangible results that make you dominate your industry.\n\n` +
+                    `🎯 [Scene 4: Strong Call to Action]\n` +
+                    `Stop wasting time and money on trial and error. Click the link right now, get your access to (${productName}), and kickstart your transformation today!`;
+            } else {
+                document.getElementById('resultContent').innerText = data.script;
+            }
+
+        } catch (error) {
+            document.getElementById('loading').style.display = 'none';
+            alert('Error: ' + error.message);
+        }
+    }
+</script>
+
+</body>
+</html>
