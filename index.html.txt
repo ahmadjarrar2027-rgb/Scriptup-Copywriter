@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScriptUp - صانع السكريبتات البيعية</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; text-align: right; }
+        .container { max-width: 800px; background: white; margin: 0 auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: #2c3e50; text-align: center; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #34495e; }
+        input[type="text"], textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 14px; background-color: #2ecc71; border: none; color: white; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #27ae60; }
+        .result-box { margin-top: 30px; padding: 20px; background: #eef2f3; border-left: 5px solid #2ecc71; border-radius: 6px; white-space: pre-line; display: none; font-size: 16px; line-height: 1.6; }
+        .loading { text-align: center; color: #7f8c8d; display: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚀 ScriptUp Copywriter</h1>
+    <p style="text-align: center; color: #7f8c8d;">اصنع سيناريوهات بيعية تكتسح السوشيال ميديا بكبسة زر</p>
+    
+    <div class="form-group">
+        <label>اسم المنتج أو الخدمة:</label>
+        <input type="text" id="productName" placeholder="مثال: كورس مبيعات الـ High-Ticket">
+    </div>
+
+    <div class="form-group">
+        <label>الجمهور المستهدف بالتحديد:</label>
+        <input type="text" id="audience" placeholder="مثال: أصحاب الشركات الناشئة والصناّع المستقلين">
+    </div>
+
+    <div class="form-group">
+        <label>المشكلة الأكبر التي يحلها المنتج (Pain Point):</label>
+        <textarea id="painPoint" rows="3" placeholder="مثال: بصرفوا فلوس ع الإعلانات وما بطلعوا بمبيعات تذكر"></textarea>
+    </div>
+
+    <button onclick="generateScript()">توليد السيناريو البيعي ✨</button>
+
+    <div class="loading" id="loading">جاري التفكير وصياغة السيناريو بأعلى جودة مبيعات...</div>
+    <div class="result-box" id="resultBox"></div>
+</div>
+
+<script>
+    async function generateScript() {
+        const productName = document.getElementById('productName').value;
+        const audience = document.getElementById('audience').value;
+        const painPoint = document.getElementById('painPoint').value;
+
+        if(!productName || !audience || !painPoint) {
+            alert('رجاءً املأ الفراغات كاملة لنتمكن من صياغة نص دقيق!');
+            return;
+        }
+
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('resultBox').style.display = 'none';
+
+        try {
+            // الاتصال بالسيرفر المحلي للجافا اللي رح نشغله
+            const response = await fetch('http://localhost:8080/api/generate-script', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productName, audience, painPoint })
+            });
+
+            const data = await response.json();
+            
+            document.getElementById('loading').style.display = 'none';
+            if(data.script) {
+                document.getElementById('resultBox').innerText = data.script;
+                document.getElementById('resultBox').style.display = 'block';
+            } else {
+                alert('حدث خطأ: ' + data.error);
+            }
+        } catch (error) {
+            document.getElementById('loading').style.display = 'none';
+            alert('لم نتمكن من الاتصال بالباك إند. تأكد أن برنامج الجافا شغال!');
+        }
+    }
+</script>
+
+</body>
+</html>
